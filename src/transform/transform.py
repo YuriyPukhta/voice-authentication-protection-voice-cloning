@@ -147,9 +147,9 @@ class EqualizerWrapperTransform:
             min_gain_db=-10,
             max_gain_db=10
     ):
-        self.room_simulator_transform = SevenBandParametricEQ(
+        self.equalizer = SevenBandParametricEQ(
             min_gain_db=min_gain_db, max_gain_db=max_gain_db, p=1.0)
 
     def __call__(self, samples: NDArray[np.float32], sr: int):
-        samples = self.room_simulator_transform(samples, sr)
+        samples = self.equalizer(samples, sr)
         return (samples, sr)

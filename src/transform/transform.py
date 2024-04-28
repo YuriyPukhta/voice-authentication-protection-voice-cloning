@@ -37,6 +37,30 @@ class ToMelSpectrogramTransform:
 
         return (spec)
 
+class AudioToTimeSeriesTransform:
+    def __init__(
+            self,
+            n_fft,
+            hop_len=None,
+            win_length=None,
+            top_db=80,
+            normalize=False
+    ):
+        self.spectrogram = transforms.Spectrogram(
+            n_fft,
+            win_length=win_length,
+            hop_length=hop_len,
+        )
+        self.amplitude_to_db = transforms.AmplitudeToDB(top_db=top_db)
+        self.normalize = normalize
+
+    def __call__(self, samples: NDArray[np.float32], _: int):
+        samples = torch.from_numpy(samples)
+        spec = self.spectrogram(samples)
+        spec = self.amplitude_to_db(spec)
+        spec = spec.permute(1, 0)
+        spec = spec.squeeze(0)
+        return (spec)
 
 class CustomAdjustDurationTransform:
     def __init__(

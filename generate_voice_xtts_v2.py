@@ -14,10 +14,10 @@ class DataFrameColumn(str, Enum):
     generated_path = "generated_path"
 
 
-data_directory = "source_folder"
-source_folder = data_directory + "/validated"
-generated_folder = data_directory + "/generated"
-generated_voice_tsv = data_directory + "/data/en/generated.tsv"
+data_directory = "your_source_folder"
+source_folder = data_directory + "/data/validated"
+generated_folder = data_directory + "/data/generated"
+generated_voice_tsv = data_directory + "/data/generated.tsv"
 tsv_file_path = generated_voice_tsv
 df = pd.read_csv(tsv_file_path, sep='\t')
 
@@ -30,6 +30,6 @@ for _, row in df.iterrows():
             tts.tts_to_file(text=generated_sentence,
                             speaker_wav=source_voice, language="en", file_path=generated_voice)
         except Exception as exc:
-            print(f"Error wail voice generation row with error {str(exc)}")
+            print(f"Error while voice generation: row with error {str(exc)}")
     else:
-        print("Already generate: generated_voice ")
+        print(f"Already generate: {generated_voice} ")

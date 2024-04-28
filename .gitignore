@@ -1,6 +1,6 @@
 .env
 data/en/clips/*
-data/validated/*.mp3
+data/*/*.mp3
 
 data/en/times.txt
 # Byte-compiled / optimized / DLL files

@@ -31,7 +31,7 @@ class GeneratedSoundDS(Dataset):
                 [
                     ResampleTransform(target_sample_rate=sample_rate),
                     CustomAdjustDurationTransform(duration_seconds=duration),
-                    ToSpectrogramTransform(
+                    ToMelSpectrogramTransform(
                         sample_rate=sample_rate, n_mels=64, n_fft=512)
                 ]
             )

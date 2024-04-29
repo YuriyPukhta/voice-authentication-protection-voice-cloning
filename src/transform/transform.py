@@ -130,7 +130,7 @@ class ShiftWrapperTransform:
             min_shift=0.2,
             max_shift=0.2
     ):
-        self.shift_transform = Shift(min_shift=min_shift, max_shift=max_shift)
+        self.shift_transform = Shift(min_shift=min_shift, max_shift=max_shift, p=1)
 
     def __call__(self, samples: NDArray[np.float32], sr: int):
         samples = self.shift_transform(samples, sr)
@@ -169,7 +169,8 @@ class EqualizerWrapperTransform:
     def __init__(
             self,
             min_gain_db=-10,
-            max_gain_db=10
+            max_gain_db=10,
+            p=0.7
     ):
         self.equalizer = SevenBandParametricEQ(
             min_gain_db=min_gain_db, max_gain_db=max_gain_db, p=1.0)

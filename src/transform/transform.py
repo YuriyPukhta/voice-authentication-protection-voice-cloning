@@ -87,7 +87,7 @@ class CustomAdjustDurationTransform:
         elif sample_length > target_samples_length:
             if self.padding_direction == "start":
                 start = 0
-            elif self.padding_direction != "end":
+            elif self.padding_direction == "end":
                 start = sample_length - target_samples_length
             else:
                 start = np.random.randint(
@@ -98,7 +98,7 @@ class CustomAdjustDurationTransform:
         elif sample_length < target_samples_length:
             if self.padding_direction == "start":
                 pad_width = (target_samples_length - sample_length, 0)
-            elif self.padding_direction != "end":
+            elif self.padding_direction == "end":
                 pad_width = (0, target_samples_length - sample_length)
             else:
                 pad_begin_len = random.randint(

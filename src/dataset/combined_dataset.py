@@ -1,7 +1,7 @@
 import librosa
 
 from src.columns.combined_dataset_column import CombinedDatasetColumn
-from src.transform.transform import CustomAdjustDurationTransform, ResampleTransform, ToSpectrogramTransform
+from src.transform.transform import CustomAdjustDurationTransform, ResampleTransform, ToMelSpectrogramTransform
 import torch
 from torch.utils.data import Dataset
 
@@ -31,7 +31,7 @@ class CombinedSoundDS(Dataset):
                 [
                     ResampleTransform(target_sample_rate=sample_rate),
                     CustomAdjustDurationTransform(duration_seconds=duration),
-                    ToSpectrogramTransform(
+                    ToMelSpectrogramTransform(
                         sample_rate=sample_rate, n_mels=64, n_fft=512)
                 ]
             )

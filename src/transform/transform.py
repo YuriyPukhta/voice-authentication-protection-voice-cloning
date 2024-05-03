@@ -7,7 +7,7 @@ import numpy as np
 import torch
 import librosa
 from torchaudio import transforms
-from audiomentations import AirAbsorption, RoomSimulator, Shift, SevenBandParametricEQ
+from audiomentations import AirAbsorption, RoomSimulator, Shift, SevenBandParametricEQ, PitchShift, AddGaussianNoise, Aliasing
 from torchvision.transforms.functional import normalize
 
 
@@ -128,9 +128,10 @@ class ShiftWrapperTransform:
     def __init__(
             self,
             min_shift=0.2,
-            max_shift=0.2
+            max_shift=0.2,
+            p=1,
     ):
-        self.shift_transform = Shift(min_shift=min_shift, max_shift=max_shift)
+        self.shift_transform = Shift(min_shift=min_shift, max_shift=max_shift, p = p)
 
     def __call__(self, samples: NDArray[np.float32], sr: int):
         samples = self.shift_transform(samples, sr)
@@ -176,4 +177,52 @@ class EqualizerWrapperTransform:
 
     def __call__(self, samples: NDArray[np.float32], sr: int):
         samples = self.equalizer(samples, sr)
+        return (samples, sr)
+
+
+class PitchShiftWrapperTransform:
+    def __init__(
+            self,
+            min_semitones=-5,
+            max_semitones=5,
+            p = 1.0,
+    ):
+        self.pitcher = PitchShift(
+            min_semitones=min_semitones,
+            max_semitones=max_semitones,
+            p=p
+        )
+
+    def __call__(self, samples: NDArray[np.float32], sr: int):
+        samples = self.pitcher(samples, sr)
+        return (samples, sr)
+    
+class AddGaussianNoiseWrapperTransform:
+    def __init__(
+            self,
+            min_amplitude=0.0,
+            max_amplitude=0.005,
+            p = 1.0,
+    ):
+        self.nosier = AddGaussianNoise(
+            min_amplitude=min_amplitude,
+            max_amplitude=max_amplitude,
+            p=p
+        )
+
+    def __call__(self, samples: NDArray[np.float32], sr: int):
+        samples = self.nosier(samples, sr)
+        return (samples, sr)
+        
+class AddAliasingWrapperTransform:
+    def __init__(
+            self,
+            min_sample_rate=8000,
+            max_sample_rate=32000,
+            p = 1.0,
+    ):
+        self.aliasing = Aliasing(min_sample_rate=min_sample_rate, max_sample_rate=max_sample_rate, p=1.0)
+
+    def __call__(self, samples: NDArray[np.float32], sr: int):
+        samples = self.aliasing(samples, sr)
         return (samples, sr)

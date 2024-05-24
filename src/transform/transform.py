@@ -34,7 +34,7 @@ class ToMelSpectrogramTransform:
             mean = [0.5]
             std = [0.5]
             spec = normalize(spec, mean, std)
-
+        spec = spec.unsqueeze(0)
         return (spec)
 
 class AudioToTimeSeriesTransform:

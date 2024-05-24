@@ -42,7 +42,6 @@ class CombinedSoundDS(Dataset):
     def _get_sgram(self, audio_file):
         audio, sample_rate = librosa.load(audio_file, sr=self.sample_rate)
         spectrogram = self.transform.transform((audio, sample_rate))
-        spectrogram = spectrogram.unsqueeze(0)
         return spectrogram
 
     def _get_label(self, anchor_client_id, posneg_client_id, anchor_source, posneg_source):

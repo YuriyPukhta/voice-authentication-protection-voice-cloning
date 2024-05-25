@@ -5,6 +5,7 @@ data/validated/*.mp3
 data/generated/*.mp3
 data/documentation/*.mp3
 data/documentation/*.mp3
+data/en/times.txt
 data/KAGGLE
 # Byte-compiled / optimized / DLL files
 __pycache__/

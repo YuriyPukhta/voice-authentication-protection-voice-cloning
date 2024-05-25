@@ -9,19 +9,20 @@ from src.api.auth.schemas import RecordSessionResponse, UserInput, AuthResponse,
 from src.api.dependencies.auth import get_request_auth, get_request_session
 from src.api.dependencies.db import get_db
 from src.api.utils.compare_similarite import similar
-from src.api.utils.transcribe import get_text_from_speach
+from src.service.transcribe import get_text_from_speach
 from src.config import AppConfig
 from src.constant import CodeType
 from src.errors import NotFound, AudioProcessingError, BadRequest, AuthRequestFailed
-from src.models_db import RequestSession, RequestAuth, User
-from src.repository_utils.code import get_code_by_code
+from src.models_db import RequestSession, RequestAuth
+from src.repository_utils.code import get_code_by_code, add_code_record
 from src.repository_utils.record import add_record, get_record_by_user_id
 from src.repository_utils.requset_auth import add_request_register, add_request_session, update_request_session
 from src.repository_utils.user import add_user, get_user_by_username, get_user_by_id
 from src.service.fake_sentence import generate_random_sentence
-from src.service.generated_id import generate_guid, generate_random_six_digit_number
+from src.service.generated_id import generate_guid
 from src.service.jwt_service import create_jwt_register, create_jwt_auth
 from src.service.save_file import save_audio_locally
+from src.service.voice_auth import validate
 
 save_path = './file'
 
@@ -43,11 +44,13 @@ async def transcribe(file: UploadFile = File(...), db: Session = Depends(get_db)
     if record is None:
         raise BadRequest("Bad User")
 
-    text_from_record = await get_text_from_speach(file)
-    if similar(text_from_record, request) < config.SIMILARITY_LIMIT:
-        raise AuthRequestFailed("Recorded text dose not corresponded target")
-
-    code = add_record(db=db)
+    #text_from_record = await get_text_from_speach(file)
+    #if similar(text_from_record, request) < config.SIMILARITY_LIMIT:
+        #raise AuthRequestFailed("Recorded text dose not corresponded target")
+    res = validate(record.path, file.file)
+    if res < config.NEGATIVE_THRESHOLD:
+        raise AuthRequestFailed("Current voice docent correspond target")
+    code = add_code_record(user_id=user.id, db=db)
     return AuthResponse(
         code=code
         )
@@ -83,7 +86,7 @@ async def request_register(userInput: UserInput,  db: Session = Depends(get_db))
         token=create_jwt_register(request.id),
         text=request.text,
         start_at=request.update_at,
-        duration = config.TIME_FOR_RECORD
+        duration=config.TIME_FOR_RECORD
     )
 
 
@@ -111,11 +114,10 @@ async def update(request=Security(get_request_session), db: Session = Depends(ge
         duration=config.TIME_FOR_RECORD
     )
 
-
 @auth_router.post("/validate-code")
 async def validate_code(code: CodeInputModel, db: Session = Depends(get_db)):
     code = get_code_by_code(code.code, db=db)
-    if code is None:
+    if code is None or code.created_at + timedelta(minutes=config.CODE_VALID_IN_MINUTES) < datetime.utcnow():
         raise NotFound("Code not found")
     user = get_user_by_username(username=code.username, db=db)
     if user is None:

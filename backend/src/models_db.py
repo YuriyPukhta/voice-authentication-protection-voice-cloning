@@ -56,9 +56,8 @@ class SixDigitCode(Base):
     code = Column(String(6), unique=True, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     user_id: Mapped[uuid.UUID] = Column(
-        ForeignKey("user.id", name="request_user_id_fkey", ondelete="cascade"),
+        ForeignKey("user.id", name="code_user_id_fkey", ondelete="cascade"),
         index=True,
         nullable=False,
     )
-    user: Mapped["User"] = relationship(back_populates="request", passive_deletes="all")
 

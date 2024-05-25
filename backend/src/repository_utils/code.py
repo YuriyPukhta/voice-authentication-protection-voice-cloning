@@ -10,7 +10,7 @@ def get_code_by_code(code: int,  db: Session):
     return db.query(SixDigitCode).filter(SixDigitCode.code == code).first()
 
 
-def add_record(user_id: uuid, db: Session):
+def add_code_record(user_id: uuid, db: Session):
     code = generate_random_six_digit_number()
     db_code = SixDigitCode(code=code, user_id=user_id)
     db.add(db_code)

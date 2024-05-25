@@ -8,3 +8,5 @@ class AppConfig (BaseSettings):
     ALGORITHM = "HS256"
     SIMILARITY_LIMIT = 0.9
     TIME_FOR_RECORD = 60
+    NEGATIVE_THRESHOLD = 0.6
+    CODE_VALID_IN_MINUTES = 60

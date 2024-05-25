@@ -1,0 +1,29 @@
+version: '3.7'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: auth-db-compose
+    hostname: postgres
+    ports:
+      - "6666:5432"
+    environment:
+      POSTGRES_DB: main
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pre_check_in_postgres_data:/var/lib/postgresql/data
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    hostname: azurite
+    restart: no
+    environment:
+      AZURITE_ACCOUNTS: ${AZURE_ACCOUNT_NAME}:${AZURE_ACCOUNT_KEY}
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+
+volumes:
+  pre_check_in_postgres_data:

@@ -40,7 +40,6 @@ class BaseSoundDS(Dataset):
     def _get_sgram(self, audio_file):
         audio, sample_rate = librosa.load(audio_file, sr=self.sample_rate)
         spectrogram = self.transform.transform((audio, sample_rate))
-        spectrogram = spectrogram.unsqueeze(0)
         return spectrogram
 
     def _get_sample_path(self, path):

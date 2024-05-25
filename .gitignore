@@ -3,9 +3,9 @@ data/en/clips/*
 data/*/*.mp3
 data/validated/*.mp3
 data/generated/*.mp3
->>>>>>>>> Temporary merge branch 2
-
-data/en/times.txt
+data/documentation/*.mp3
+data/documentation/*.mp3
+data/KAGGLE
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

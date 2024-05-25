@@ -3,6 +3,8 @@ data/en/clips/*
 data/*/*.mp3
 data/validated/*.mp3
 data/generated/*.mp3
+data/KAGGLE
+
 data/documentation/*.mp3
 data/documentation/*.mp3
 data/en/times.txt

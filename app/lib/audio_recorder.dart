@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:auth_app/microphone.dart';
 import 'package:auth_app/service/timer.dart';
@@ -16,8 +17,12 @@ import 'package:auth_app/widget/audio_recorder_web.dart';
 class RecorderAuth extends StatefulWidget {
   final String text;
   final String token;
-
-  const RecorderAuth({super.key, required this.text, required this.token});
+  final int timer;
+  const RecorderAuth(
+      {super.key,
+      required this.text,
+      required this.token,
+      required this.timer});
 
   @override
   State<RecorderAuth> createState() => _RecorderAuthState();
@@ -26,12 +31,16 @@ class RecorderAuth extends StatefulWidget {
 class _RecorderAuthState extends State<RecorderAuth> with AudioRecorderMixin {
   late String path;
   final String apiUrl = 'http://127.0.0.1:8000/api/v1/transcribe';
+  final String apiUpdateUrl = 'http://127.0.0.1:8000/api/v1/update-session';
   bool success = false;
   bool error = false;
   String code = "";
-
+  String? text;
+  int? timerMaxSeconds;
   @override
   void initState() {
+    timerMaxSeconds = widget.timer;
+    text = widget.text;
     super.initState();
   }
 
@@ -43,7 +52,7 @@ class _RecorderAuthState extends State<RecorderAuth> with AudioRecorderMixin {
         http.MultipartFile.fromBytes(
           'file',
           responseFile.bodyBytes,
-          filename: 'audio.wav', // You may need to adjust the file extension
+          filename: 'audio.wav',
         ),
       )
       ..headers.addAll({
@@ -58,11 +67,29 @@ class _RecorderAuthState extends State<RecorderAuth> with AudioRecorderMixin {
       setState(() {
         success = true;
       });
-    } else if (response.statusCode > 500) {
+    } else if (response.statusCode != 500) {
       setState(() {
         error = true;
       });
     }
+  }
+
+  void reset() async {
+    final response = await http.post(
+      Uri.parse(apiUpdateUrl),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        "Authorization": "Bearer ${widget.token}",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      setState(() {
+        text = responseData["text"];
+        timerMaxSeconds = responseData["duration"];
+      });
+    } else {}
   }
 
   @override
@@ -103,14 +130,16 @@ class _RecorderAuthState extends State<RecorderAuth> with AudioRecorderMixin {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const OtpTimer(
-                        timerMaxSeconds: 60,
+                      OtpTimer(
+                        key: Key(timerMaxSeconds.toString()),
+                        timerMaxSeconds: timerMaxSeconds!,
+                        onTimerStop: reset,
                       ),
                       Row(
                         children: [
                           const Text("Other phrase"),
                           IconButton(
-                              onPressed: () {},
+                              onPressed: reset,
                               icon: const Icon(Icons.replay_outlined)),
                         ],
                       ),
@@ -126,9 +155,9 @@ class _RecorderAuthState extends State<RecorderAuth> with AudioRecorderMixin {
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(color: Colors.teal)),
-                    child: const Text(
-                      "Some random generated phrases",
-                      style: TextStyle(
+                    child: Text(
+                      text!,
+                      style: const TextStyle(
                         fontSize: 15,
                         color: Colors.black,
                       ),

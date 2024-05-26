@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 
 class OtpTimer extends StatefulWidget {
   final int timerMaxSeconds;
-
-  const OtpTimer({super.key, required this.timerMaxSeconds});
+  final Function onTimerStop;
+  const OtpTimer(
+      {super.key, required this.timerMaxSeconds, required this.onTimerStop});
 
   @override
   _OtpTimerState createState() => _OtpTimerState();
@@ -37,6 +38,7 @@ class _OtpTimerState extends State<OtpTimer>
         if (timer.tick >= widget.timerMaxSeconds) {
           timer.cancel();
           _animationController.stop();
+          widget.onTimerStop();
         }
       });
     });

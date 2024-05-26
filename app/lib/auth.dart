@@ -19,8 +19,8 @@ class Auth extends StatefulWidget {
 class _AuthState extends State<Auth> {
   final String apiUrl = 'http://127.0.0.1:8000/api/v1/auth';
   final TextEditingController nameController = TextEditingController();
-
-  String result = ''; // To store the result from the API call
+  String? errorText;
+  String result = '';
 
   @override
   void dispose() {
@@ -29,6 +29,13 @@ class _AuthState extends State<Auth> {
   }
 
   Future<void> _postData() async {
+    if (nameController.text == "") {
+      setState(() {
+        errorText = "Enter name";
+      });
+      return;
+    }
+
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -37,12 +44,10 @@ class _AuthState extends State<Auth> {
         },
         body: jsonEncode(<String, dynamic>{
           'username': nameController.text,
-          // Add any other data you want to send in the body
         }),
       );
 
       if (response.statusCode == 200) {
-        // Successful POST request, handle the response here
         final responseData = jsonDecode(response.body);
         Navigator.push(
           context,
@@ -50,12 +55,14 @@ class _AuthState extends State<Auth> {
             builder: (context) => RecorderAuth(
               text: responseData["text"],
               token: responseData["token"],
+              timer: responseData["duration"],
             ),
           ),
         );
-      } else {
-        // If the server returns an error response, throw an exception
-        throw Exception('Failed to post data');
+      } else if (response.statusCode == 401) {
+        setState(() {
+          errorText = "Enter correct name";
+        });
       }
     } catch (e) {
       setState(() {
@@ -108,12 +115,18 @@ class _AuthState extends State<Auth> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
                   child: TextFormField(
+                    onChanged: (_) {
+                      setState(() {
+                        errorText = null;
+                      });
+                    },
                     controller: nameController,
                     decoration: InputDecoration(
                         border: const UnderlineInputBorder(
                             borderSide: BorderSide(color: Colors.teal)),
                         labelText: 'Enter your username',
-                        labelStyle: TextStyle(color: Colors.teal.shade900)),
+                        labelStyle: TextStyle(color: Colors.teal.shade900),
+                        errorText: errorText),
                   ),
                 ),
                 Row(

@@ -16,10 +16,10 @@ class New extends StatefulWidget {
 }
 
 class _NewState extends State<New> {
-  final String apiUrl = 'http://127.0.0.1:8000/api/v1/request';
+  final String apiUrl = 'http://127.0.0.1:8000/api/v1/request-register';
   final TextEditingController nameController = TextEditingController();
 
-  String result = ''; // To store the result from the API call
+  String result = '';
 
   @override
   void dispose() {

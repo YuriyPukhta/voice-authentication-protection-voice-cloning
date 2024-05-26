@@ -52,7 +52,7 @@ async def transcribe(file: UploadFile = File(...), db: Session = Depends(get_db)
         raise AuthRequestFailed("Current voice docent correspond target")
     code = add_code_record(user_id=user.id, db=db)
     return AuthResponse(
-        code=code
+        code=str(code)
         )
 
 @auth_router.post("/register")
@@ -110,7 +110,7 @@ async def update(request=Security(get_request_session), db: Session = Depends(ge
     update_session = update_request_session(request, new_text=text, db=db)
     return SessionUpdateResponse(
         text=update_session.text,
-        start_at=update_session.update_at,
+        update_at=update_session.update_at,
         duration=config.TIME_FOR_RECORD
     )
 

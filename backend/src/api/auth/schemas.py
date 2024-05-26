@@ -24,7 +24,7 @@ class UserInput(BaseDtoModel):
 
 
 class AuthResponse(BaseDtoModel):
-    code: int
+    code: str
 
 
 class SessionUpdateResponse(BaseDtoModel):
@@ -34,7 +34,7 @@ class SessionUpdateResponse(BaseDtoModel):
 
 
 class CodeInputModel(BaseDtoModel):
-    code: int
+    code: str
     username: str
 
 class CodeResponse(BaseDtoModel):

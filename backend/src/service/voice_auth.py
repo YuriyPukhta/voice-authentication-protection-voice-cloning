@@ -115,7 +115,7 @@ class CompositeTransformation:
 
 
 def get_load_model():
-    model = torch.load('./model_save/' + "combined_cnn_mix_augmented.pt")
+    model = torch.load('./model_save/' + "combined_cnn_mix.pt")
     model.eval()
     return model
 

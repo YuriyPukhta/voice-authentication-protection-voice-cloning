@@ -9,7 +9,6 @@ from src.errors import add_error_handlers
 
 def create_app():
     app = FastAPI(
-        title="Pre-check-in",
         docs_url="/api/docs",
     )
     app.include_router(api_router, prefix="/api")
